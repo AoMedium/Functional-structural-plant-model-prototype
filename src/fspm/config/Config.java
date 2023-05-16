@@ -77,7 +77,7 @@ public class Config implements ParamAccessor {
     
     private void addGroup(String key, ParamGroup group) {
     	if (paramGroups.containsKey(key)) {
-    		throw new KeyConflictException(key, this.toString());
+    		throw new KeyConflictException(key);
     	}
     	paramGroups.put(key, group);
     }
