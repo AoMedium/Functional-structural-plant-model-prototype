@@ -199,7 +199,7 @@ public class Config implements ParamAccessor {
 		return value != null ? value : defaultValue;
 	}
 	
-	public double getInteger(String key, double defaultValue) {
+	public double getDouble(String key, double defaultValue) {
 		Double value = getDouble(key);
 		return value != null ? value : defaultValue;
 	}
