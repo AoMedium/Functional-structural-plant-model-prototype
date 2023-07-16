@@ -54,7 +54,11 @@ public class Config implements ParamAccessor {
     }
     
     public void reset() {
-    	paramGroups = new HashMap<>();
+    	if (paramGroups == null) {
+    		paramGroups = new HashMap<>();
+    	} else {
+        	paramGroups.clear();
+    	}
     	groupContext = null;
     	categoryContext = null;
     }
