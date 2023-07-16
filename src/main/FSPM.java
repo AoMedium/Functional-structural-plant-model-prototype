@@ -42,6 +42,8 @@ public class FSPM {
 					new JsonFileReader("./inputs/parameters/model.input.data.name.json"));
 			CONFIG.addGroup("model.input.data.default", 
 					new JsonFileReader("./inputs/parameters/model.input.data.default.json"));
+			CONFIG.addGroup("phenology.parameters.SauvignonBlanc", 
+					new JsonFileReader("./inputs/parameters/phenology.parameters.SauvignonBlanc.json"));
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
