@@ -1,6 +1,7 @@
 package main;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 
 import fspm.config.Config;
 import fspm.config.adapters.JsonFileReader;
@@ -15,8 +16,9 @@ public class FSPM {
 		
 		addGroups();
 		
-//		tests();
-		tests_default();
+//		test_types();
+//		test_default();
+		test_phenology();
 		
 //		accessExamples();
 	}
@@ -100,7 +102,7 @@ public class FSPM {
 //		println(CONFIG.getBoolean("useStaticArc"));
 	}
 	
-	private static void tests() {
+	private static void test_types() {
 		CONFIG.setGroupContext("group");
 		CONFIG.setCategoryContext("category");
 		
@@ -109,7 +111,7 @@ public class FSPM {
 		test_getNullAsTypes();
 	}
 	
-	private static void tests_default() {
+	private static void test_default() {
 		println(CONFIG.getGroup("model.input.data.default"));
 		
 		CONFIG.setGroupContext("model.input.data.default");
@@ -135,6 +137,13 @@ public class FSPM {
 		println(CONFIG.getDouble("nullParam") == null);
 		
 		println(CONFIG.isNull("nullParam"));
+	}
+	
+	private static void test_phenology() {
+		CONFIG.setGroupContext("phenology.parameters.SauvignonBlanc");
+		CONFIG.setCategoryContext("parameters");
+		
+		println(Arrays.toString(CONFIG.getDoubleArray("BUDBURST_CANE_DIFF")));
 	}
 	
 

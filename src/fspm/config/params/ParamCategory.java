@@ -3,6 +3,7 @@ package fspm.config.params;
 import java.util.HashMap;
 import java.util.Map;
 
+import fspm.config.params.type.ArrayParam;
 import fspm.config.params.type.BooleanParam;
 import fspm.config.params.type.DoubleParam;
 import fspm.config.params.type.IntegerParam;
@@ -104,6 +105,15 @@ public class ParamCategory implements ParamAccessor {
 		set(key, param);
 	}
 
+	@Override
+	public void set(String key, Double[] value) {
+		ArrayParam<Double> param = (ArrayParam<Double>) getIfInstanceOf(key, ArrayParam.class);
+		
+		param.setValue(value);
+		set(key, param);	
+	}
+
+
 
 	@Override
 	public Boolean getBoolean(String key) {
@@ -143,7 +153,13 @@ public class ParamCategory implements ParamAccessor {
 		String value = ((StringParam) getIfInstanceOf(key, StringParam.class)).getValue();
 		return Double.valueOf(value); // Convert "1.0f" to 1.0
 	}
-
+	
+	@Override
+	public Double[] getDoubleArray(String key) {
+		if (isNull(key)) {{ return null; }}
+		
+		return ((ArrayParam<Double>) getIfInstanceOf(key, ArrayParam.class)).getValue();
+	}
 	
 	
 	/**
@@ -216,5 +232,4 @@ public class ParamCategory implements ParamAccessor {
 		}
 		return format;
 	}
-
 }

@@ -184,7 +184,12 @@ public class Config implements ParamAccessor {
 		checkContextsExists();
 		return categoryContext.getDouble(key);
 	}
-	
+
+	@Override
+	public Double[] getDoubleArray(String key) {
+		checkContextsExists();
+		return categoryContext.getDoubleArray(key);
+	}
 	
 	
 	
@@ -231,6 +236,13 @@ public class Config implements ParamAccessor {
 
 	@Override
 	public void set(String key, double value) {
+		checkContextsExists();
+		categoryContext.set(key, value);
+	}
+	
+
+	@Override
+	public void set(String key, Double[] value) {
 		checkContextsExists();
 		categoryContext.set(key, value);
 	}
