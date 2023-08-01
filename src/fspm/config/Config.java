@@ -213,6 +213,18 @@ public class Config implements ParamAccessor {
 		return value != null ? value : defaultValue;
 	}
 	
+	public double[] getDoubleArray(String key, double[] defaultValue) {
+		Double[] storedValue = getDoubleArray(key);
+		
+		// Convert from Double[] to double[]
+		double[] value = new double[storedValue.length];
+		for (int i = 0; i < storedValue.length; i++) {
+			value[i] = storedValue[i];
+		}
+		
+		return value != null ? value : defaultValue;
+	}
+	
 
 	
 	
