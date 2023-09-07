@@ -18,7 +18,8 @@ public class FSPM {
 		
 //		test_types();
 //		test_default();
-		test_phenology();
+//		test_phenology();
+		test_flatCategories();
 		
 //		accessExamples();
 	}
@@ -147,6 +148,29 @@ public class FSPM {
 	}
 	
 
+	private static void test_flatCategories() {
+		CONFIG.reset();
+		addGroups();
+		CONFIG.useFlattenedCategories = true;
+		
+		String group = "model.input.data.default";
+		
+		CONFIG.setGroupContext(group);
+		
+		
+		println(CONFIG.getGroup(group));
+		
+		println(CONFIG.getBoolean("useStaticArc"));
+		println(CONFIG.getDouble("FractionDiffuseLightDaily"));
+
+		println(CONFIG.getDouble("radiationControl"));
+		println(CONFIG.getDouble("REFTMP"));
+		
+		println(CONFIG.getString("rootArchitecture_file"));
+	}
+	
+	
+	
 	
 	
 	private static void println(Object o) {

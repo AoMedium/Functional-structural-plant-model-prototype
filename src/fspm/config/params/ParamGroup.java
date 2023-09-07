@@ -68,6 +68,24 @@ public class ParamGroup {
         throw new KeyNotFoundException(key, "Could not find category");
     }
     
+    /**
+     * @return The first category containing the parameter with the given key.
+     */
+    public ParamCategory getCategoryWithParam(String paramKey) {
+    	for (ParamCategory category : categories.values()) {
+ 			try {
+ 				category.get(paramKey);
+ 				return category;
+ 			} catch (KeyNotFoundException e) {
+ 				// This category does not contain the key
+ 				continue;
+ 			}
+ 		}
+    	throw new KeyNotFoundException(paramKey, 
+				String.format("Could not find parameter '%s' in any category within group '%s'", paramKey, getKey()));
+    }
+ 		
+    
     @Override
     public String toString() {
     	StringBuilder string = new StringBuilder();
