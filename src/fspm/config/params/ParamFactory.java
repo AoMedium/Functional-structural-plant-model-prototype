@@ -1,6 +1,8 @@
 package fspm.config.params;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fspm.config.params.type.*;
 import fspm.util.exceptions.UnsupportedException;
@@ -25,17 +27,27 @@ public class ParamFactory {
      *                              to any concrete {@link Parameter} implementation.
      */
     public Parameter getParam(String name, JsonNode node) {
-    	if (node.isNull() || node.toString().equals(NullParam.nullString)) {
-            return new NullParam(name);
-        } else if (node.isInt()) {
-            return new IntegerParam(name, node.intValue());
-        } else if (node.isDouble()) {
-            return new DoubleParam(name, node.doubleValue());
-        } else if (node.isBoolean()) {
-            return new BooleanParam(name, node.booleanValue());
-        } else if (node.isTextual()) {
-            return new StringParam(name, node.textValue());
-        }
+    	try {
+	    	if (node.isNull() || node.toString().equals(NullParam.nullString)) {
+	            return new NullParam(name);
+	        } else if (node.isInt()) {
+	            return new IntegerParam(name, node.intValue());
+	        } else if (node.isDouble()) {
+	            return new DoubleParam(name, node.doubleValue());
+	        } else if (node.isBoolean()) {
+	            return new BooleanParam(name, node.booleanValue());
+	        } else if (node.isTextual()) {
+	            return new StringParam(name, node.textValue());
+	        } else if (node.isArray()) {
+	        	ObjectMapper objectMapper = new ObjectMapper();
+	        	// Check type of array. TODO: generalize ArrayParam for multiple types.
+	    		if (node.get(0).isDouble()) {
+					return new ArrayParam<Double>(name, objectMapper.treeToValue(node, Double[].class));
+	    		}
+	        }
+    	} catch (Exception e) {
+    		throw new RuntimeException(String.format("An error occured while parsing parameter: %s.\n%s", name, e));
+    	}
 
         throw new UnsupportedException(name + " uses an unsupported type.");
     }

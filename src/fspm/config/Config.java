@@ -22,6 +22,15 @@ public class Config implements ParamAccessor {
      * Set to null by default until instance is first retrieved with {@link #getInstance()}.
      */
     private static Config instance = null;
+    
+    /**
+     * If parameters are stored in a flat structure, get and set parameter methods will
+     * seek out the first occurrence of the given parameter key.
+     *<p>
+     * Warning: this means duplicate parameter keys may result in either parameter
+     * being chosen unpredictably.
+     */
+    public boolean useFlattenedCategories;
 
     /**
      * We use Map instead of Set to allow us to check for key conflicts.
@@ -54,7 +63,12 @@ public class Config implements ParamAccessor {
     }
     
     public void reset() {
-    	paramGroups = new HashMap<>();
+    	if (paramGroups == null) {
+    		paramGroups = new HashMap<>();
+    	} else {
+        	paramGroups.clear();
+    	}
+    	useFlattenedCategories = false;
     	groupContext = null;
     	categoryContext = null;
     }
@@ -77,7 +91,7 @@ public class Config implements ParamAccessor {
     
     private void addGroup(String key, ParamGroup group) {
     	if (paramGroups.containsKey(key)) {
-    		throw new KeyConflictException(key, this.toString());
+    		throw new KeyConflictException(key);
     	}
     	paramGroups.put(key, group);
     }
@@ -142,45 +156,74 @@ public class Config implements ParamAccessor {
     		throw new NullPointerException("Please set a group context to access parameter categories.");
     	}
     }
-    private void checkCategoryContextExists() {
-    	if (categoryContext == null) {
-    		throw new NullPointerException("Please set a category context to access parameters.");
-    	}
+    
+    private boolean isCategoryContextExists() {
+    	return categoryContext != null;
     }
     
-    
-    
-    
-    private void checkContextsExists() {
+    private void checkContextsExists(String key) {
     	checkGroupContextExists();
-    	checkCategoryContextExists();
+
+
+    	// Check: if using flattened categories, then check if key exists in current category. Else, find category and set as context
+    	// If not using flattened categories, check if categorycontext exists
+    	
+    	if (useFlattenedCategories) {
+        	// Check if current category contains key.
+    		if (isCategoryContextExists()) {
+    			try {
+        			categoryContext.get(key);
+        			// No exception; found key; continue as normal
+        			return;
+        		} catch (KeyNotFoundException e) {
+        			// Cannot find key; search other categories.
+        		}
+    		}
+    		
+    		/** 
+        	 * Directly set category context, as no need to search again with {@link #setCategoryContext(String)}.
+        	 * FIXME: getCategoryWithParam(key) may be acting as a middle-man
+        	 * 
+        	 * Purpose: to find the category containing the key and set as the categoryContext, such that getters can
+        	 * utilise type specific getBoolean (etc) methods to get the parameter.
+        	 * 
+        	 * Could be improved using Java Generics.
+        	 */
+    		categoryContext = groupContext.getCategoryWithParam(key);
+    		return;
+    	}
     }
     
 
 	@Override
 	public Boolean getBoolean(String key) {
-		checkContextsExists();
+		checkContextsExists(key);
 		return categoryContext.getBoolean(key);
 	}
 
 	@Override
 	public String getString(String key) {
-		checkContextsExists();
+		checkContextsExists(key);
 		return categoryContext.getString(key);
 	}
 
 	@Override
 	public Integer getInteger(String key) {
-		checkContextsExists();
+		checkContextsExists(key);
 		return categoryContext.getInteger(key);
 	}
 
 	@Override
 	public Double getDouble(String key) {
-		checkContextsExists();
+		checkContextsExists(key);
 		return categoryContext.getDouble(key);
 	}
-	
+
+	@Override
+	public Double[] getDoubleArray(String key) {
+		checkContextsExists(key);
+		return categoryContext.getDoubleArray(key);
+	}
 	
 	
 	
@@ -199,8 +242,20 @@ public class Config implements ParamAccessor {
 		return value != null ? value : defaultValue;
 	}
 	
-	public double getInteger(String key, double defaultValue) {
+	public double getDouble(String key, double defaultValue) {
 		Double value = getDouble(key);
+		return value != null ? value : defaultValue;
+	}
+	
+	public double[] getDoubleArray(String key, double[] defaultValue) {
+		Double[] storedValue = getDoubleArray(key);
+		
+		// Convert from Double[] to double[]
+		double[] value = new double[storedValue.length];
+		for (int i = 0; i < storedValue.length; i++) {
+			value[i] = storedValue[i];
+		}
+		
 		return value != null ? value : defaultValue;
 	}
 	
@@ -209,31 +264,38 @@ public class Config implements ParamAccessor {
 	
 	@Override
 	public void set(String key, boolean value) {
-		checkContextsExists();
+		checkContextsExists(key);
 		categoryContext.set(key, value);
 	}
 
 	@Override
 	public void set(String key, String value) {
-		checkContextsExists();
+		checkContextsExists(key);
 		categoryContext.set(key, value);
 	}
 
 	@Override
 	public void set(String key, int value) {
-		checkContextsExists();
+		checkContextsExists(key);
 		categoryContext.set(key, value);
 	}
 
 	@Override
 	public void set(String key, double value) {
-		checkContextsExists();
+		checkContextsExists(key);
+		categoryContext.set(key, value);
+	}
+	
+
+	@Override
+	public void set(String key, Double[] value) {
+		checkContextsExists(key);
 		categoryContext.set(key, value);
 	}
 	
 	@Override
 	public boolean isNull(String key) {
-		checkContextsExists();
+		checkContextsExists(key);
 		return categoryContext.isNull(key);
 	}
 }

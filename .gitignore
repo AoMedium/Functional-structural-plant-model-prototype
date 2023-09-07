@@ -33,6 +33,7 @@ templates
 **/slurm-*.out
 **/core.*
 /bin/
+/bin1/
 
 # Eclipse
 .project
